@@ -1,9 +1,0 @@
-Metadata-Version: 2.1
-Name: battleship-ai
-Version: 0.1.0
-Summary: Battleship base system with Agent 1 random guessing.
-Requires-Python: >=3.11
-Description-Content-Type: text/markdown
-Provides-Extra: dev
-
-Project assignment is in progress.
