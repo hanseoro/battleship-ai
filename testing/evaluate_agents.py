@@ -238,7 +238,7 @@ def run_evaluation(*, agents: List[str], games: int, seed: int, board_size: int,
     existing_counts = get_existing_game_counts(old_rows)
     run_id = get_next_run_id(old_rows)
 
-    new_rows: List[dict] = []
+    pending_rows: List[dict] = []
 
     for agent_key in agents:
         if agent_key not in AGENT_FACTORIES:
@@ -278,12 +278,16 @@ def run_evaluation(*, agents: List[str], games: int, seed: int, board_size: int,
                 "ship_sizes": result_row["ship_sizes"],
             }
 
-            new_rows.append(result_row)
+            pending_rows.append(result_row)
 
             if game_number % 100 == 0:
+                append_csv_rows(per_game_path, PER_GAME_FIELDS, pending_rows)
+                pending_rows.clear()
                 print(f"  {agent_key}: completed game {game_number}")
 
-    append_csv_rows(per_game_path, PER_GAME_FIELDS, new_rows)
+        if pending_rows:
+            append_csv_rows(per_game_path, PER_GAME_FIELDS, pending_rows)
+            pending_rows.clear()
 
     all_rows = read_csv_rows(per_game_path)
 
