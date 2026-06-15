@@ -149,6 +149,8 @@ python3 testing/evaluate_agents.py --agents random checkerboard heatmap bayesian
 
 One important warning: the Bayesian Monte Carlo agent is much slower than the other three, so it is smart to test it with smaller counts first before launching a huge run.
 
-## Current status
+## Relevant Literature
 
-Right now the codebase is in a good place for running and comparing the four attack agents. The fast agents are easy to scale into the thousands of games. The main practical limit is the Bayesian Monte Carlo agent, which is much more expensive per game than the others.
+https://is.muni.cz/th/oupp1/Reinforcement_Learning_for_the_Game_of_Battleship.pdf
+https://link.springer.com/chapter/10.1007/978-3-319-00542-3_20
+https://arxiv.org/abs/2004.07354
