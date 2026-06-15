@@ -151,6 +151,6 @@ One important warning: the Bayesian Monte Carlo agent is much slower than the ot
 
 ## Relevant Literature
 
-https://is.muni.cz/th/oupp1/Reinforcement_Learning_for_the_Game_of_Battleship.pdf
-https://link.springer.com/chapter/10.1007/978-3-319-00542-3_20
-https://arxiv.org/abs/2004.07354
+https://is.muni.cz/th/oupp1/Reinforcement_Learning_for_the_Game_of_Battleship.pdf  
+https://link.springer.com/chapter/10.1007/978-3-319-00542-3_20  
+https://arxiv.org/abs/2004.07354  
