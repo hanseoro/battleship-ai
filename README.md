@@ -1,29 +1,6 @@
-# Battleship AI Project
+# Battleship AI
 
-This project is our Battleship simulator and attack-agent tester for CS 175. The main idea is simple: we hide a standard Battleship board, let different AI agents guess shots one turn at a time, and then compare how efficiently they finish the game. We used this setup to see how much smarter strategies actually help compared to a basic random-style baseline.
-
-What makes the project interesting is that every agent sees only partial information. An agent only knows which shots already happened, which ones missed, which ones hit, and which ships have been sunk. From there, it has to decide the next best shot without seeing the full board.
-
-## How the project works
-
-The code is split into a few small parts:
-
-- `src/battleship/engine.py` runs a single Battleship game, checks ship placement legality, and handles hit, miss, and sunk logic.
-- `src/battleship/simulation.py` runs many games in a row and computes summary stats.
-- `src/battleship/agent_random.py` is the baseline agent. It explores randomly, but after landing a hit it follows nearby cells to try to finish the ship.
-- `src/battleship/agent_checkerboard.py` uses parity, so it mainly shoots checkerboard-pattern cells first.
-- `src/battleship/agent_heatmap.py` scores cells based on how many legal ship placements pass through them.
-- `src/battleship/agent_bayesianMC.py` samples possible remaining boards and fires at the cell that appears most often.
-- `testing/evaluate_agents.py` runs larger experiments and saves per-game and summary results.
-
-In short, the flow is:
-
-1. Randomly place ships on the board.
-2. Give the chosen agent the current observation.
-3. Let the agent pick a shot.
-4. Update the board with hit, miss, or sunk.
-5. Repeat until all ships are sunk.
-6. Save the total attacks and compare agents over many games.
+An exploration of different algorithms for solving a randomized standard Battleship board. 
 
 ## Agents included
 
@@ -105,13 +82,13 @@ Available agent names:
 - `heatmap`
 - `bayesian_mc`
 
-If you want per-game output:
+For per-game output:
 
 ```bash
 python3 -m battleship --agent heatmap --games 5 --seed 42 --per-game
 ```
 
-If you want a full shot-by-shot trace:
+For a full shot-by-shot trace:
 
 ```bash
 python3 -m battleship --agent random --games 1 --seed 42 --verbose
