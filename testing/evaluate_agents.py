@@ -2,7 +2,7 @@
 Sample cl input:
 python testing/evaluate_agents.py --agents random checkerboard heatmap bayesian_mc --games 10 --seed 42
 
-Use --fresh to clear and overwrite old csv
+Use --fresh to clear and overwrite old csv files
 """
 
 from __future__ import annotations
@@ -13,6 +13,7 @@ import json
 import random
 import statistics
 import sys
+import time
 from collections import defaultdict
 from pathlib import Path
 from typing import Callable, Dict, Iterable, List
@@ -66,6 +67,7 @@ PER_GAME_FIELDS = [
     "board_seed",
     "agent_seed",
     "total_attacks",
+    "game_time_s",
     "board_size",
     "ship_sizes",
 ]
@@ -79,6 +81,7 @@ SUMMARY_FIELDS = [
     "std_attacks",
     "min_attacks",
     "max_attacks",
+    "mean_game_time_s",
 ]
 
 
@@ -188,7 +191,9 @@ def run_one_game(*, agent_key: str, agent_seed: int, board_seed: int, board_size
         ship_sizes=ship_sizes,
     )
 
-    result = run_single_game(agent,config=config,seed=board_seed)
+    t0 = time.perf_counter()
+    result = run_single_game(agent, config=config, seed=board_seed)
+    game_time_s = time.perf_counter() - t0
 
     if isinstance(result, int):
         total_attacks = result
@@ -212,6 +217,7 @@ def run_one_game(*, agent_key: str, agent_seed: int, board_seed: int, board_size
         "board_seed": board_seed,
         "agent_seed": agent_seed,
         "total_attacks": total_attacks,
+        "game_time_s": f"{game_time_s:.6f}",
         "board_size": board_size,
         "ship_sizes": "-".join(str(size) for size in ship_sizes),
     }
@@ -274,6 +280,7 @@ def run_evaluation(*, agents: List[str], games: int, seed: int, board_size: int,
                 "board_seed": result_row["board_seed"],
                 "agent_seed": result_row["agent_seed"],
                 "total_attacks": result_row["total_attacks"],
+                "game_time_s": result_row["game_time_s"],
                 "board_size": result_row["board_size"],
                 "ship_sizes": result_row["ship_sizes"],
             }
@@ -326,6 +333,9 @@ def build_summary_rows(per_game_rows: List[dict]) -> List[dict]:
         else:
             std_attacks = 0.0
 
+        game_times = [float(row["game_time_s"]) for row in rows if row.get("game_time_s")]
+        mean_game_time_s = f"{statistics.mean(game_times):.6f}" if game_times else ""
+
         summary_rows.append(
             {
                 "agent_key": agent_key,
@@ -336,6 +346,7 @@ def build_summary_rows(per_game_rows: List[dict]) -> List[dict]:
                 "std_attacks": f"{std_attacks:.6f}",
                 "min_attacks": min(attacks),
                 "max_attacks": max(attacks),
+                "mean_game_time_s": mean_game_time_s,
             }
         )
 
