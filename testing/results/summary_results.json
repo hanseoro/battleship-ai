@@ -1,0 +1,42 @@
+[
+  {
+    "agent_key": "bayesian_mc",
+    "agent_name": "Agent 4 - Bayesian Search",
+    "num_games": 25000,
+    "mean_attacks": "44.950040",
+    "median_attacks": "44.000000",
+    "std_attacks": "9.209116",
+    "min_attacks": 18,
+    "max_attacks": 72
+  },
+  {
+    "agent_key": "checkerboard",
+    "agent_name": "Agent 2 - Checkerboard",
+    "num_games": 25000,
+    "mean_attacks": "56.257760",
+    "median_attacks": "57.000000",
+    "std_attacks": "7.970758",
+    "min_attacks": 22,
+    "max_attacks": 100
+  },
+  {
+    "agent_key": "heatmap",
+    "agent_name": "Agent 3 - Probability Heatmap",
+    "num_games": 25000,
+    "mean_attacks": "52.870120",
+    "median_attacks": "48.000000",
+    "std_attacks": "16.265775",
+    "min_attacks": 21,
+    "max_attacks": 100
+  },
+  {
+    "agent_key": "random",
+    "agent_name": "Agent 1 - Random Guessing",
+    "num_games": 25000,
+    "mean_attacks": "64.813080",
+    "median_attacks": "64.000000",
+    "std_attacks": "15.890838",
+    "min_attacks": 21,
+    "max_attacks": 100
+  }
+]

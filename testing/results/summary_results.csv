@@ -1,0 +1,5 @@
+agent_key,agent_name,num_games,mean_attacks,median_attacks,std_attacks,min_attacks,max_attacks
+bayesian_mc,Agent 4 - Bayesian Search,25000,44.950040,44.000000,9.209116,18,72
+checkerboard,Agent 2 - Checkerboard,25000,56.257760,57.000000,7.970758,22,100
+heatmap,Agent 3 - Probability Heatmap,25000,52.870120,48.000000,16.265775,21,100
+random,Agent 1 - Random Guessing,25000,64.813080,64.000000,15.890838,21,100
