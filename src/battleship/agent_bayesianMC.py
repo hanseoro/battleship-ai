@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import random
+import time
 from collections import Counter
 from dataclasses import dataclass, field
 from typing import Iterable, Optional, Set, Tuple
@@ -19,10 +20,9 @@ class BayesianMCAgent:
     sunk ships. It then shoots the untried cell that appears most often across
     those valid configurations.
 
-    The exact Bayesian version would enumerate every valid complete board. That
-    can be expensive, so this implementation enumerates/samples up to
-    max_configurations valid boards and uses those boards to approximate the
-    posterior probability map.
+    The exact Bayesian version would enumerate every valid complete board which 
+    is expensive, so this implementation enumerates/samples up to max_configurations
+    valid boards and uses those boards to approximate the posterior probability map.
     """
 
     ship_sizes: tuple[int, ...] = (5, 4, 3, 3, 2)
@@ -50,7 +50,6 @@ class BayesianMCAgent:
         posterior_scores = self._build_posterior_scores(observation)
         
         return max(sorted(observation.untried_cells), key=lambda coord: posterior_scores.get(coord, 0))
-
 
     def on_shot_result(self, coord: Coord, result: ShotResult) -> None:
         self._attempted.add(coord)
@@ -151,56 +150,51 @@ class BayesianMCAgent:
 
 
 
-        valid_worlds: list[set[Coord]] = []
-
-        max_attempts = self.max_configurations * 50
-
-        for _ in range(max_attempts):
-            if len(valid_worlds) >= self.max_configurations:
-                break
-
-            occupied: set[Coord] = set()
-            valid = True
-
-            # Shuffle ship order so repeated lengths, like the two length-3 ships,
-            # do not always get placed in the same deterministic order.
+        def sample_one_world() -> set[Coord] | None:
             ship_order = list(remaining_ship_sizes)
             self._rng.shuffle(ship_order)
 
-            for ship_size in ship_order:
-                possible_placements = placements_by_size.get(ship_size, [])
+            def backtrack(ship_index: int, occupied: set[Coord], uncovered: set[Coord]) -> set[Coord] | None:
+                if ship_index == len(ship_order):
+                    return set(occupied) if not uncovered else None
 
-                if not possible_placements:
-                    valid = False
-                    break
+                # Prune: each uncovered hit must still be reachable by a remaining ship.
+                if uncovered:
+                    remaining_sizes = set(ship_order[ship_index:])
+                    for hit in uncovered:
+                        if not any(
+                            hit in p and not (p & occupied)
+                            for sz in remaining_sizes
+                            for p in placements_by_size.get(sz, [])
+                        ):
+                            return None
 
-                # Try placements in randomized order.
-                shuffled_placements = list(possible_placements)
-                self._rng.shuffle(shuffled_placements)
+                ship_size = ship_order[ship_index]
+                candidates = list(placements_by_size.get(ship_size, []))
+                self._rng.shuffle(candidates)
 
-                chosen_placement = None
-
-                for placement in shuffled_placements:
-                    # Ships cannot overlap each other.
+                for placement in candidates:
                     if placement & occupied:
                         continue
+                    result = backtrack(ship_index + 1, occupied | placement, uncovered - placement)
+                    if result is not None:
+                        return result
 
-                    chosen_placement = placement
-                    break
+                return None
 
-                if chosen_placement is None:
-                    valid = False
-                    break
+            return backtrack(0, set(), set(active_hits))
 
-                occupied.update(chosen_placement)
-
-            if not valid:
-                continue
-
-            if not active_hits.issubset(occupied):
-                continue
-
-            valid_worlds.append(occupied)
+        valid_worlds: list[set[Coord]] = []
+        max_attempts = self.max_configurations * 3
+        deadline = time.monotonic() + 5.0
+        for _ in range(max_attempts):
+            if len(valid_worlds) >= self.max_configurations:
+                break
+            if time.monotonic() > deadline:
+                break
+            world = sample_one_world()
+            if world is not None:
+                valid_worlds.append(world)
 
         return valid_worlds
 
@@ -221,7 +215,3 @@ class BayesianMCAgent:
         self._resolved_hits = resolved_hits
 
         self._active_hits = all_hit_cells - resolved_hits
-
-    def _in_bounds(self, coord: Coord, board_size: int) -> bool:
-        row, col = coord
-        return 0 <= row < board_size and 0 <= col < board_size
